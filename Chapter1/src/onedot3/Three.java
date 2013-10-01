@@ -38,6 +38,7 @@ public class Three{
     	   while(j >= 0){
     		   if(str.charAt(j) == str.charAt(i)){
     			   dup = true;
+    			   break;
     		   }
     		   j--;
     	   }
