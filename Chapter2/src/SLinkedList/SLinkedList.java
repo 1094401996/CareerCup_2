@@ -27,7 +27,7 @@ public class SLinkedList {
 		this.tail = tail;
 	}
 	
-	public SNode gettail(){
+	public SNode getTail(){
 		return tail;
 	}
 	//add node to the tail
