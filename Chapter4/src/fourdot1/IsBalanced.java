@@ -7,7 +7,7 @@
  */
 
 
-package fouedot1;
+package fourdot1;
 
 import binarytree.BinaryTree;
 

@@ -1,5 +1,6 @@
 package binarytree;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -114,6 +115,23 @@ public class BinaryTree {
 		}
 	}
 	
+	
+	public Node findNode(int element){
+        return findNode(root, element);
+}
+
+private Node findNode(Node n , int element){
+        if(n == null){
+                return null;
+        }
+        if(n.getElement() == element){
+                return n;
+        }
+        Node left = findNode(n.getLeft(),element);
+        Node right = findNode(n.getRight(),element);
+        return left == null ? right : left;
+}
+	
 	//4.1
 	
 	public boolean isBalanced1(Node n){
@@ -159,7 +177,41 @@ public class BinaryTree {
 		return -2;
 	}
 	
-	
+	// 4.4 
+	public LinkedList[] linkedTree(Node n){
+		if( n == null)
+			return null;
+		
+		int H = getHeight(n);
+		
+		LinkedList[] ll = new LinkedList[H + 1];
+		
+		for(int i = 0 ; i < H + 1; i++){
+			ll[i] = new LinkedList();
+		}
+		
+		ArrayList<Node> array = new ArrayList<Node>();
+		array.add(n);
+		int cur = 0 ;
+		int last = 1;
+		int level = 0;
+		while(cur < array.size()){
+			last = array.size();//the new level begins, 重新定位last于当前行最后一个节点的下一个位置
+			while(cur < last){
+				ll[level].add(array.get(cur));
+				if(array.get(cur).getLeft()!= null){
+					array.add((array.get(cur).getLeft()));
+				}
+				if(array.get(cur).getRight() != null){
+					array.add(array.get(cur).getRight());
+				}
+				cur++;
+			}
+			level++;
+		}
+		return ll;
+		
+	}
 	
 	//4.5
 	class IntegerWapper{
@@ -197,6 +249,172 @@ public class BinaryTree {
 		
 		return true;
 	}
+	
+	// 4.7  method 1
+	
+	public Node lowestCommonAncester1(Node p , Node q){
+		return lowestCommonAncester1(root,p,q);
+	}
+	private Node lowestCommonAncester1(Node n, Node p, Node q){
+        if(!isDecendent(n,p) || !isDecendent(n,q)){
+                return null;
+        }
+        else
+                return lowestCommonAncester1Helper(n, p, q);
+	}
+	private boolean isDecendent(Node n, Node p){
+		if(n == null){
+			return false;
+		}
+		if(n == p){
+			return true;
+		}
+		return isDecendent(n.getLeft(),p) || isDecendent(n.getRight(),p);
+	}
+	private Node lowestCommonAncester1Helper(Node n, Node p , Node q ){
+		if(n == null)
+			return null;
+		if(n == p || n == q){
+			return n;
+		}
+		
+		boolean is_p_left = isDecendent(n.getLeft(),p);
+		boolean is_q_left = isDecendent(n.getLeft(),q);
+		
+		if(is_p_left != is_q_left){
+			return n;
+		}
+		
+		Node child_side = is_p_left ? n.getLeft() : n.getRight();
+		return lowestCommonAncester1Helper(child_side,p,q);
+	
+	}
+	
+// 4.7 method 2
+	public Node lowestCommonAncester2(Node p, Node q ){
+		Result s = lowestCommomAncestor2Helper(root,p,q);
+		if(s.isAncestor){
+			System.out.println("real");
+			return s.node;
+		}
+		System.out.println("false");
+		System.out.println(s.node.getElement());
+		return null;
+	}
+	
+	Result lowestCommomAncestor2Helper(Node n, Node p, Node q){
+
+		if(n == null)
+			return new Result(null, false);
+		if(n == p && n == q){
+			return new Result(n, true);
+		}
+		Result rleft = lowestCommomAncestor2Helper(n.getLeft(), p, q);
+		if(rleft.isAncestor){
+			return rleft;
+		}
+		Result rright = lowestCommomAncestor2Helper(n.getRight(), p, q);
+		if(rright.isAncestor)
+			return rright;
+		
+		if(rleft.node != null && rright.node != null){
+			return new Result(n,true);
+		}else if( n == p || n == q){
+			/*
+			 * we are currently at p or q, and we also fond one of those nodes
+			 * in a subtree,then this is truly an ancester and the flag should be true
+			 */
+			boolean isAncester = rleft.node != null || rright.node != null ? true :false;
+			return new Result(n,isAncester);
+		}else{
+			return new Result(rleft.node != null ? rleft.node :rright.node,false);
+		}
+	}
+	
+	
+	class Result{
+		Node node;
+		boolean isAncestor;
+		Result(Node node, boolean isAnc){
+			this.node = node;
+			this.isAncestor = isAnc;
+		}
+	}
+	
+	//4.8
+	
+	public boolean isSubtree( Node root){
+		if(root == null)
+			return true;
+		return subtreehelper(this.root,root);
+	}
+	
+	private boolean subtreehelper(Node n1, Node n2){
+		if(n1 == null){
+			return false;
+		}
+		if(n1.getElement() == n2.getElement()){
+			if(match(n1,n2))
+				return true;
+		}
+		return (subtreehelper(n1.getLeft(), n2) || subtreehelper(n1.getRight(),n2));
+	}
+	private boolean match(Node n1, Node n2){
+		if(n1 == null && n2 == null)
+			return true;
+		if(n1 == null || n2 == null)
+			return false;
+		if(n1.getElement() != n2.getElement())
+			return false;
+		
+		return (match(n1.getLeft(),n2.getLeft()) && match(n1.getRight(),n2.getRight()));
+	}
+	
+	//4.9
+	
+	
+	public void findSum(int sum){
+		findSum(root, sum);
+	}
+	private void findSum(Node n ,int sum){
+		int height = this.getHeight(n);
+		int[]path = new int[height + 1];
+		findSum(n,sum,path,0);
+	}
+	
+	private void findSum(Node n, int sum, int[]path,int level){
+		if(n == null){
+			return ;
+		}
+		path[level] = n.getElement();
+		
+		
+		int t = 0; 
+		for(int i = level; i >= 0; i--){
+			t+=path[i];
+			if(t == sum){
+				print(path,i,level);
+			}
+		}
+		
+		/*search nodes beneath this one*/
+		this.findSum(n.getLeft(), sum, path, level + 1);
+		this.findSum(n.getRight(), sum, path, level + 1);
+		
+		//remove current node fromm path. Not strickly necessary, since we would ignore the 
+        // value, but it's a good practice
+		
+        path[level] = Integer.MIN_VALUE;
+	}
+	
+	private void print(int[]path,int start, int end){
+		for(int i = start; i <= end ; i++){
+			System.out.print(path[i] +" ->");
+		}
+		System.out.println();
+	}
+	
+	
 	
 	
 	

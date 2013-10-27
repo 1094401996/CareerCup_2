@@ -1,4 +1,4 @@
-package foutdot5;
+package fourdot5;
 
 import binarytree.BinaryTree;
 
